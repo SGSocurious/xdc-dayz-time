@@ -84,7 +84,7 @@ async def update_status():
             else:
                 bot_status = discord.Status.idle
 
-            status_text = f"Server time {server_time}"
+            status_text = f"{server_time} Server time"
 
         print(f"[TIME] {status_text}")
 
