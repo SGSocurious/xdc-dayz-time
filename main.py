@@ -79,7 +79,7 @@ async def update_status():
 
             hour = int(server_time.split(":")[0])
 
-            if 6 <= hour < 20:
+            if 6 <= hour < 15:
                 bot_status = discord.Status.online
             else:
                 bot_status = discord.Status.idle
