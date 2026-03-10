@@ -100,6 +100,6 @@ async def update_status():
         await bot.change_presence(
             status=discord.Status.dnd,
             activity=discord.Game(name="Server offline")
-
+        )
 
 bot.run(TOKEN)
