@@ -29,7 +29,11 @@ def in_restart_window():
         restart_times.append(today_restart + timedelta(days=1))
 
     next_restart = min(rt for rt in restart_times if rt > now)
-    last_restart = max(rt for rt in restart_times if rt <= now)
+
+    last_restart = max((rt for rt in restart_times if rt <= now), default=None)
+
+    if last_restart is None:
+        return False
 
     window_start = last_restart - timedelta(minutes=2)
     window_end = last_restart + timedelta(minutes=2)
@@ -107,5 +111,6 @@ async def update_status():
                 name="Server offline"
             )
         )
+
 
 bot.run(TOKEN)
