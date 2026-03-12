@@ -19,24 +19,21 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 def in_restart_window():
 
-    now = datetime.now(AMSTERDAM)
+    # edge-case fix: seconden/microseconden verwijderen
+    now = datetime.now(AMSTERDAM).replace(second=0, microsecond=0)
 
     restart_times = []
 
     for hour in RESTART_HOURS:
-        today_restart = now.replace(hour=hour, minute=0, second=0, microsecond=0)
+        today_restart = now.replace(hour=hour, minute=0)
         restart_times.append(today_restart)
         restart_times.append(today_restart + timedelta(days=1))
+        restart_times.append(today_restart - timedelta(days=1))
 
-    next_restart = min(rt for rt in restart_times if rt > now)
+    closest_restart = min(restart_times, key=lambda rt: abs(rt - now))
 
-    last_restart = max((rt for rt in restart_times if rt <= now), default=None)
-
-    if last_restart is None:
-        return False
-
-    window_start = last_restart - timedelta(minutes=2)
-    window_end = last_restart + timedelta(minutes=2)
+    window_start = closest_restart - timedelta(minutes=2)
+    window_end = closest_restart + timedelta(minutes=2)
 
     return window_start <= now <= window_end
 
@@ -63,9 +60,7 @@ async def on_ready():
 @tasks.loop(seconds=30)
 async def update_status():
 
-    if in_restart_window():
-        print("[RESTART] Skipping update during restart window")
-        return
+    restart = in_restart_window()
 
     try:
 
@@ -83,10 +78,14 @@ async def update_status():
 
             hour = int(server_time.split(":")[0])
 
-            if 4 <= hour < 21:
-                bot_status = discord.Status.online
-            else:
+            # restart override
+            if restart:
                 bot_status = discord.Status.idle
+            else:
+                if 4 <= hour < 21:
+                    bot_status = discord.Status.online
+                else:
+                    bot_status = discord.Status.idle
 
             status_text = f"{server_time} Server time"
 
