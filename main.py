@@ -78,14 +78,10 @@ async def update_status():
 
             hour = int(server_time.split(":")[0])
 
-            # restart override
-            if restart:
-                bot_status = discord.Status.idle
+            if 4 <= hour < 21:
+                bot_status = discord.Status.online
             else:
-                if 4 <= hour < 21:
-                    bot_status = discord.Status.online
-                else:
-                    bot_status = discord.Status.idle
+                bot_status = discord.Status.idle
 
             status_text = f"{server_time} Server time"
 
