@@ -60,7 +60,10 @@ async def on_ready():
 @tasks.loop(seconds=30)
 async def update_status():
 
-    restart = in_restart_window()
+    # STOP updates tijdens restart window
+    if in_restart_window():
+        print("[RESTART] Skipping update during restart window")
+        return
 
     try:
 
